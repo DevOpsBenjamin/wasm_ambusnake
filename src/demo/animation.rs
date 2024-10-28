@@ -5,11 +5,9 @@
 //! - [Timers](https://github.com/bevyengine/bevy/blob/latest/examples/time/timers.rs)
 
 use bevy::prelude::*;
-use rand::prelude::*;
 use std::time::Duration;
 
 use crate::{
-    audio::SoundEffect,
     demo::{movement::MovementController, player::PlayerAssets},
     AppSet,
 };
@@ -23,8 +21,7 @@ pub(super) fn plugin(app: &mut App) {
             update_animation_timer.in_set(AppSet::TickTimers),
             (
                 update_animation_movement,
-                update_animation_atlas,
-                trigger_step_sound_effect,
+                update_animation_atlas
             )
                 .chain()
                 .run_if(resource_exists::<PlayerAssets>)
@@ -64,31 +61,6 @@ fn update_animation_atlas(mut query: Query<(&PlayerAnimation, &mut TextureAtlas)
     for (animation, mut atlas) in &mut query {
         if animation.changed() {
             atlas.index = animation.get_atlas_index();
-        }
-    }
-}
-
-/// If the player is moving, play a step sound effect synchronized with the
-/// animation.
-fn trigger_step_sound_effect(
-    mut commands: Commands,
-    player_assets: Res<PlayerAssets>,
-    mut step_query: Query<&PlayerAnimation>,
-) {
-    for animation in &mut step_query {
-        if animation.state == PlayerAnimationState::Walking
-            && animation.changed()
-            && (animation.frame == 2 || animation.frame == 5)
-        {
-            let rng = &mut rand::thread_rng();
-            let random_step = player_assets.steps.choose(rng).unwrap();
-            commands.spawn((
-                AudioBundle {
-                    source: random_step.clone(),
-                    settings: PlaybackSettings::DESPAWN,
-                },
-                SoundEffect,
-            ));
         }
     }
 }
@@ -133,10 +105,6 @@ impl PlayerAnimation {
             frame: 0,
             state: PlayerAnimationState::Walking,
         }
-    }
-
-    pub fn new() -> Self {
-        Self::idling()
     }
 
     /// Update animation timers.

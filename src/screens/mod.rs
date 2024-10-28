@@ -28,6 +28,7 @@ pub enum Screen {
     Splash,
     Loading,
     Title,
+    HighScore,
     Credits,
     Gameplay,
 }

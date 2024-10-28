@@ -1,7 +1,3 @@
-//! Plugin handling the player character in particular.
-//! Note that this is separate from the `movement` module as that could be used
-//! for other characters as well.
-
 use bevy::{
     ecs::{system::RunSystemOnce as _, world::Command},
     prelude::*,
@@ -10,10 +6,7 @@ use bevy::{
 
 use crate::{
     asset_tracking::LoadResource,
-    demo::{
-        animation::PlayerAnimation,
-        movement::{MovementController, ScreenWrap},
-    },
+    demo::movement::{MovementController, ScreenWrap},
     screens::Screen,
     AppSet,
 };
@@ -50,35 +43,21 @@ fn spawn_player(
     In(config): In<SpawnPlayer>,
     mut commands: Commands,
     player_assets: Res<PlayerAssets>,
-    mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
 ) {
-    // A texture atlas is a way to split one image with a grid into multiple
-    // sprites. By attaching it to a [`SpriteBundle`] and providing an index, we
-    // can specify which section of the image we want to see. We will use this
-    // to animate our player character. You can learn more about texture atlases in
-    // this example: https://github.com/bevyengine/bevy/blob/latest/examples/2d/texture_atlas.rs
-    let layout = TextureAtlasLayout::from_grid(UVec2::splat(32), 6, 2, Some(UVec2::splat(1)), None);
-    let texture_atlas_layout = texture_atlas_layouts.add(layout);
-    let player_animation = PlayerAnimation::new();
-
+    // Spawn the player character using a simple PNG without animation.
     commands.spawn((
         Name::new("Player"),
         Player,
         SpriteBundle {
             texture: player_assets.ducky.clone(),
-            transform: Transform::from_scale(Vec2::splat(8.0).extend(1.0)),
+            transform: Transform::from_scale(Vec2::splat(1.0).extend(1.0)), // Adjust size as needed
             ..Default::default()
-        },
-        TextureAtlas {
-            layout: texture_atlas_layout.clone(),
-            index: player_animation.get_atlas_index(),
         },
         MovementController {
             max_speed: config.max_speed,
             ..default()
         },
         ScreenWrap,
-        player_animation,
         StateScoped(Screen::Gameplay),
     ));
 }
@@ -90,21 +69,19 @@ fn record_player_directional_input(
     // Collect directional input.
     let mut intent = Vec2::ZERO;
     if input.pressed(KeyCode::KeyW) || input.pressed(KeyCode::ArrowUp) {
-        intent.y += 1.0;
+        intent.y += 64.0;
     }
     if input.pressed(KeyCode::KeyS) || input.pressed(KeyCode::ArrowDown) {
-        intent.y -= 1.0;
+        intent.y -= 64.0;
     }
     if input.pressed(KeyCode::KeyA) || input.pressed(KeyCode::ArrowLeft) {
-        intent.x -= 1.0;
+        intent.x -= 64.0;
     }
     if input.pressed(KeyCode::KeyD) || input.pressed(KeyCode::ArrowRight) {
-        intent.x += 1.0;
+        intent.x += 64.0;
     }
 
-    // Normalize so that diagonal movement has the same speed as
-    // horizontal and vertical movement.
-    // This should be omitted if the input comes from an analog stick instead.
+    // Normalize so that diagonal movement has the same speed as horizontal and vertical movement.
     let intent = intent.normalize_or_zero();
 
     // Apply movement intent to controllers.
@@ -115,20 +92,12 @@ fn record_player_directional_input(
 
 #[derive(Resource, Asset, Reflect, Clone)]
 pub struct PlayerAssets {
-    // This #[dependency] attribute marks the field as a dependency of the Asset.
-    // This means that it will not finish loading until the labeled asset is also loaded.
     #[dependency]
     pub ducky: Handle<Image>,
-    #[dependency]
-    pub steps: Vec<Handle<AudioSource>>,
 }
 
 impl PlayerAssets {
-    pub const PATH_DUCKY: &'static str = "images/SnakeHead.png";
-    pub const PATH_STEP_1: &'static str = "audio/sound_effects/step1.ogg";
-    pub const PATH_STEP_2: &'static str = "audio/sound_effects/step2.ogg";
-    pub const PATH_STEP_3: &'static str = "audio/sound_effects/step3.ogg";
-    pub const PATH_STEP_4: &'static str = "audio/sound_effects/step4.ogg";
+    pub const PATH_DUCKY: &'static str = "images/SnakeHead.png"; // Use your PNG path here
 }
 
 impl FromWorld for PlayerAssets {
@@ -142,12 +111,6 @@ impl FromWorld for PlayerAssets {
                     settings.sampler = ImageSampler::nearest();
                 },
             ),
-            steps: vec![
-                assets.load(PlayerAssets::PATH_STEP_1),
-                assets.load(PlayerAssets::PATH_STEP_2),
-                assets.load(PlayerAssets::PATH_STEP_3),
-                assets.load(PlayerAssets::PATH_STEP_4),
-            ],
         }
     }
 }

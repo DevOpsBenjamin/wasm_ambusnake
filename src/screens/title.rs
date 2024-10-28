@@ -14,6 +14,7 @@ fn spawn_title_screen(mut commands: Commands) {
         .insert(StateScoped(Screen::Title))
         .with_children(|children| {
             children.button("Play").observe(enter_gameplay_screen);
+            children.button("HighScore").observe(enter_highscore_screen);
             children.button("Credits").observe(enter_credits_screen);
 
             #[cfg(not(target_family = "wasm"))]
@@ -27,6 +28,10 @@ fn enter_gameplay_screen(_trigger: Trigger<OnPress>, mut next_screen: ResMut<Nex
 
 fn enter_credits_screen(_trigger: Trigger<OnPress>, mut next_screen: ResMut<NextState<Screen>>) {
     next_screen.set(Screen::Credits);
+}
+
+fn enter_highscore_screen(_trigger: Trigger<OnPress>, mut next_screen: ResMut<NextState<Screen>>) {
+    next_screen.set(Screen::HighScore);
 }
 
 #[cfg(not(target_family = "wasm"))]
