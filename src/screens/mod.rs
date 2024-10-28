@@ -1,5 +1,5 @@
 //! The game's main screen states and transitions between them.
-
+mod highscore;
 mod credits;
 mod gameplay;
 mod loading;
@@ -13,6 +13,7 @@ pub(super) fn plugin(app: &mut App) {
     app.enable_state_scoped_entities::<Screen>();
 
     app.add_plugins((
+        highscore::plugin,
         credits::plugin,
         gameplay::plugin,
         loading::plugin,
