@@ -20,20 +20,20 @@ pub(super) fn plugin(app: &mut App) {
         return_to_title_screen
             .run_if(in_state(Screen::Gameplay).and_then(input_just_pressed(KeyCode::Escape)))
     );
+    /* 
     app.add_systems(
         Update,        
         game_update
             .run_if(in_state(Screen::Gameplay))
     );
-
+fn game_update(mut next_screen: ResMut<NextState<Screen>>) {
+    //INGAME
+}
+*/
 }
 
 fn spawn_level(mut commands: Commands) {
     commands.add(spawn_level_command);
-}
-
-fn game_update(mut next_screen: ResMut<NextState<Screen>>) {
-    //INGAME
 }
 
 fn return_to_title_screen(mut next_screen: ResMut<NextState<Screen>>) {

@@ -6,7 +6,10 @@
 use bevy::prelude::*;
 
 mod pos;
+mod logic;
+mod bonus;
 mod movement;
+mod difficulty;
 pub mod music;
 pub mod snake;
 
