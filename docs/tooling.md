@@ -42,23 +42,3 @@ If you're using [VS Code](https://code.visualstudio.com/), the following extensi
 | [vscode-ron](https://marketplace.visualstudio.com/items?itemName=a5huynh.vscode-ron)                      | RON support                       |
 | [Dependi](https://marketplace.visualstudio.com/items?itemName=fill-labs.dependi)                          | `crates.io` dependency resolution |
 | [EditorConfig for VS Code](https://marketplace.visualstudio.com/items?itemName=EditorConfig.EditorConfig) | `.editorconfig` support           |
-
-> [!Note]
-> <details>
-> <summary>About the included rust-analyzer settings</summary>
->
-> This template sets [`rust-analyzer.cargo.targetDir`](https://rust-analyzer.github.io/generated_config.html#rust-analyzer.cargo.targetDir)
-> to `true` in [`.vscode/settings.json`](../.vscode/settings.json).
->
-> This makes `rust-analyzer` use a different `target` directory than `cargo`,
-> which means that you can run commands like `cargo run` even while `rust-analyzer` is still indexing.
-> As a trade-off, this will use more disk space.
->
-> If that is an issue for you, you can set it to `false` or remove the setting entirely.
-> </details>
-
-## Other templates
-
-There are many other Bevy templates out there.
-Check out the [templates category](https://bevyengine.org/assets/#templates) on Bevy Assets for more options.
-Even if you don't end up using them, they are a great way to learn how to implement certain features you might be interested in.
