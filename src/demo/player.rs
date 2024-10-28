@@ -124,7 +124,7 @@ pub struct PlayerAssets {
 }
 
 impl PlayerAssets {
-    pub const PATH_DUCKY: &'static str = "images/ducky.png";
+    pub const PATH_DUCKY: &'static str = "images/SnakeHead.png";
     pub const PATH_STEP_1: &'static str = "audio/sound_effects/step1.ogg";
     pub const PATH_STEP_2: &'static str = "audio/sound_effects/step2.ogg";
     pub const PATH_STEP_3: &'static str = "audio/sound_effects/step3.ogg";
