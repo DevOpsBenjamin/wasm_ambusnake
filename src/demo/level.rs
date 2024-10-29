@@ -2,12 +2,10 @@
 
 use bevy::{ecs::world::Command, prelude::*};
 
-use crate::demo::player::SpawnPlayer;
+use crate::{demo::player::SpawnPlayer, screens::Screen};
 
-pub(super) fn plugin(_app: &mut App) {
-    // No setup required for this plugin.
-    // It's still good to have a function here so that we can add some setup
-    // later if needed.
+pub(super) fn plugin(app: &mut App) {
+    app.add_systems(OnEnter(Screen::Gameplay), spawn_level);
 }
 
 /// A [`Command`] to spawn the level.

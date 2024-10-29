@@ -34,6 +34,19 @@ impl Move {
     }    
 
     /*
+fn update_snake(mut query: Query<(&mut Position, &Index), With<SnakeSegment>>) {
+    // Sort by index to process the head first and then each body part
+    let mut segments: Vec<_> = query.iter_mut().collect();
+    segments.sort_by_key(|(_, index)| index.0);
+
+    // Process each segment in order
+    for (pos, index) in segments {
+        println!("Segment {}: Position {:?}", index.0, pos);
+    }
+}
+
+
+
     pub fn start(&mut self) {
         self. last_move_start = SystemTime::now();
     }

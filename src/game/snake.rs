@@ -1,118 +1,163 @@
 use bevy::{
-    ecs::{system::RunSystemOnce as _, world::Command},
     prelude::*,
-    render::texture::{ImageLoaderSettings, ImageSampler},
+    render::texture::{ImageLoaderSettings, ImageSampler}, window::PrimaryWindow,
 };
 
 use crate::{
     asset_tracking::LoadResource,
-    game::pos::Pos,
+    game::level::{BOX_SIZE, BOX_COUNT_WIDTH,BOX_COUNT_HEIGHT},
     //demo::movement::{MovementController, ScreenWrap},
-    screens::Screen,
-    AppSet,
+    screens::Screen
 };
 
+
+#[derive(Component, Debug, Clone, Copy, PartialEq, Eq, Default, Reflect)]
+#[reflect(Component)]
+pub enum SnakeSegment {
+    # [default]Head,
+    Body,
+}
+
+#[derive(Component, Debug, Clone, Copy, PartialEq, Eq, Default, Reflect)]
+#[reflect(Component)]
+pub struct Position {
+    x: i16,
+    y: i16,
+}
+impl Position {
+    pub fn to_trasnform(&self, window_width: f32, window_height: f32) -> Transform {
+        let box_width_size = window_width/(BOX_COUNT_WIDTH as f32);
+        let box_height_size = window_height/(BOX_COUNT_HEIGHT as f32);
+
+        // Calculate the center offset for translation
+        let center_offset_x = box_width_size / 2.0;
+        let center_offset_y = box_height_size / 2.0;
+
+        let screen_pos_x = (self.x as f32 * box_width_size) - (window_width / 2.0);
+        let screen_pos_y =(window_height / 2.0) - (self.y as f32 * box_height_size);
+
+        Transform {
+            translation: Vec3::new(
+                screen_pos_x + center_offset_x, // Shift X to center the origin
+                screen_pos_y - center_offset_y, // Shift Y to center the origin
+                0.0,
+            ),
+            scale: Vec3::new(box_width_size/(BOX_SIZE as f32), box_height_size/(BOX_SIZE as f32), 1.0),
+            ..Default::default()
+        }
+    }
+}
+
+#[derive(Component, Debug, Clone, Copy, PartialEq, Eq, Default, Reflect)]
+#[reflect(Component)]
+struct Index(usize);
+
 pub(super) fn plugin(app: &mut App) {
-    app.register_type::<Snake>();
+    app.register_type::<SnakeSegment>();
+    app.register_type::<Position>();
+    app.register_type::<Index>();
     app.load_resource::<SnakeAssets>();
 
-    // Record directional input as movement controls.
-    //app.add_systems(
-    //    Update,
-    //    record_player_directional_input.in_set(AppSet::RecordInput),
-    //);
+    //HANDLE SNAKE
+    app.add_systems(OnEnter(Screen::Gameplay), debug_grid);
+    app.add_systems(OnEnter(Screen::Gameplay), init_snake);
+    app.add_systems(OnExit(Screen::Gameplay), delete_snake);
 }
 
-#[derive(Component, Debug, Clone, PartialEq, Eq, Reflect)]
-#[reflect(Component)]
-pub struct Snake
-{
-    pub head: Pos,
-    pub bodies: Vec<Pos>
-}
-impl Default for Snake{
-    fn default() -> Self {
-        Self { head: Pos::new(12,8), bodies: Vec::new() }
-    }
-}
-
-/// A command to spawn the player character.
-#[derive(Debug)]
-pub struct SpawnPlayer {
-    /// See [`MovementController::max_speed`].
-    pub max_speed: f32,
-}
-
-impl Command for SpawnPlayer {
-    fn apply(self, world: &mut World) {
-        world.run_system_once_with(self, spawn_player);
-    }
-}
-
-fn spawn_player(
-    In(config): In<SpawnPlayer>,
+fn debug_grid(
     mut commands: Commands,
-    player_assets: Res<SnakeAssets>,
+    window_query: Query<&Window, With<PrimaryWindow>>,
+    snake_assets: Res<SnakeAssets>,
 ) {
-    // Spawn the player character using a simple PNG without animation.
+    // Get the window size for coordinate conversion
+    let window = window_query.single();
+    let window_width = window.width();
+    let window_height = window.height();
+
+    // Loop through the defined width and height to spawn segments
+    for x in 0..BOX_COUNT_WIDTH {
+        for y in 0..BOX_COUNT_HEIGHT {
+            // Determine whether to spawn a segment (checkerboard pattern)
+            if (x + y) % 2 == 0 { // Change this condition to achieve different patterns
+                // Determine the position for this grid segment
+                let position = Position { x, y };
+
+                // Spawn the segment
+                spawn_segment(
+                    &mut commands,        
+                    snake_assets.body.clone(),
+                    SnakeSegment::Body, // Change as needed for different segment types
+                    Position { x: position.x, y: position.y },
+                    Index(0),
+                    window_width,
+                    window_height
+                );
+            }
+        }
+    }
+}
+
+fn init_snake(
+    mut commands: Commands,
+    window_query: Query<&Window, With<PrimaryWindow>>,
+    snake_assets: Res<SnakeAssets>,
+) {
+    // Get the window size for coordinate conversion
+    let window = window_query.single();
+    let window_width = window.width();
+    let window_height = window.height();
+    spawn_segment( 
+        &mut commands,        
+        snake_assets.head.clone(),
+        SnakeSegment::Head,
+        Position { x: 12, y: 7},
+        Index(0),
+        window_width,
+        window_height
+    );
+}
+
+fn delete_snake(
+    mut commands: Commands,
+    query: Query<Entity, With<SnakeSegment>>,
+) {
+    for entity in query.iter() {
+        commands.entity(entity).despawn();
+    }
+}
+
+fn spawn_segment(
+    commands: &mut Commands,
+    segment_text: Handle<Image>,
+    segment_type: SnakeSegment,
+    initial_position: Position,
+    index: Index,
+    window_width: f32,
+    window_height: f32
+) {
     commands.spawn((
-        Name::new("Snake"),
-        Snake::default(),
+        segment_type,
+        initial_position.clone(),
+        index,
         SpriteBundle {
-            texture: player_assets.head.clone(),
-            transform: Transform::from_scale(Vec2::splat(1.0).extend(1.0)), // Adjust size as needed
+            texture: segment_text,
+            transform: initial_position.to_trasnform(window_width, window_height),
             ..Default::default()
         },
-        /* 
-        MovementController {
-            max_speed: config.max_speed,
-            ..default()
-        },
-        ScreenWrap,*/
-        StateScoped(Screen::Gameplay),
     ));
 }
-/*
-fn record_player_directional_input(
-    input: Res<ButtonInput<KeyCode>>,
-    mut controller_query: Query<&mut MovementController, With<Player>>,
-) {
-    // Collect directional input.
-    let mut intent = Vec2::ZERO;
-    if input.pressed(KeyCode::KeyW) || input.pressed(KeyCode::ArrowUp) {
-        intent.y += 64.0;
-    }
-    if input.pressed(KeyCode::KeyS) || input.pressed(KeyCode::ArrowDown) {
-        intent.y -= 64.0;
-    }
-    if input.pressed(KeyCode::KeyA) || input.pressed(KeyCode::ArrowLeft) {
-        intent.x -= 64.0;
-    }
-    if input.pressed(KeyCode::KeyD) || input.pressed(KeyCode::ArrowRight) {
-        intent.x += 64.0;
-    }
 
-    // Normalize so that diagonal movement has the same speed as horizontal and vertical movement.
-    let intent = intent.normalize_or_zero();
-
-    // Apply movement intent to controllers.
-    for mut controller in &mut controller_query {
-        controller.intent = intent;
-    }
-}*/
-
+//ASSET ZONE
 #[derive(Resource, Asset, Reflect, Clone)]
 pub struct SnakeAssets {
     #[dependency]
     pub head: Handle<Image>,
     pub body: Handle<Image>,
 }
-
 impl SnakeAssets {
     pub const PATH_HEAD: &'static str = "images/SnakeHead.png"; // Use your PNG path here
     pub const PATH_BODY: &'static str = "images/SnakeBody.png"; // Use your PNG path here
 }
-
 impl FromWorld for SnakeAssets {
     fn from_world(world: &mut World) -> Self {
         let assets = world.resource::<AssetServer>();

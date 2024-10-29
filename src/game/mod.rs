@@ -5,8 +5,8 @@
 
 use bevy::prelude::*;
 
-mod pos;
-mod logic;
+mod level;
+pub mod window;
 mod bonus;
 mod movement;
 mod difficulty;
@@ -16,5 +16,7 @@ pub mod snake;
 pub(super) fn plugin(app: &mut App) {
     app.add_plugins((
         snake::plugin,
+        music::plugin,
+        window::plugin,
     ));
 }

@@ -95,11 +95,9 @@ pub struct PlayerAssets {
     #[dependency]
     pub ducky: Handle<Image>,
 }
-
 impl PlayerAssets {
     pub const PATH_DUCKY: &'static str = "images/SnakeHead.png"; // Use your PNG path here
 }
-
 impl FromWorld for PlayerAssets {
     fn from_world(world: &mut World) -> Self {
         let assets = world.resource::<AssetServer>();

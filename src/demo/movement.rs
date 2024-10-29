@@ -60,6 +60,9 @@ fn apply_movement(
     for (controller, mut transform) in &mut movement_query {
         let velocity = controller.max_speed * controller.intent;
         transform.translation += velocity.extend(0.0) * time.delta_seconds();
+
+        // Log the new transform translation
+        //info!("Updated Transform: {:?}", transform.translation);        
     }
 }
 
