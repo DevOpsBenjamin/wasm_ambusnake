@@ -4,7 +4,7 @@
 use bevy::prelude::*;
 
 use crate::{
-    demo::player::PlayerAssets,
+    game::snake::SnakeAssets,
     game::window::LevelAssets,
     game::music::GameplayMusic,
     screens::Screen,
@@ -37,12 +37,12 @@ fn continue_to_title_screen(mut next_screen: ResMut<NextState<Screen>>) {
 }
 
 fn all_assets_loaded(
-    player_assets: Option<Res<PlayerAssets>>,
+    snake_assets: Option<Res<SnakeAssets>>,
     level_assets: Option<Res<LevelAssets>>,
     interaction_assets: Option<Res<InteractionAssets>>,
     gameplay_music: Option<Res<GameplayMusic>>,
 ) -> bool {
-    player_assets.is_some()
+    snake_assets.is_some()
         && level_assets.is_some()
         && interaction_assets.is_some()
         && gameplay_music.is_some()

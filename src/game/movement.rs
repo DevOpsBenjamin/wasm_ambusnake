@@ -5,7 +5,6 @@ use std::time::Duration;
 use crate::{
     game::{
         snake::{
-            Index, 
             Position, 
             SnakeSegment
         },
@@ -73,6 +72,7 @@ fn check_input(
                 move_manager.try_add(dir);
             } else {
                 move_manager.dir = dir;
+                move_manager.next_dir = dir;
                 got_input = true
             }
         }
@@ -89,7 +89,7 @@ fn check_input(
 
 fn check_movement(
     mut query_move: Query<&mut MoveManager>,
-    mut query_snake: Query<(&mut Position, &Index), With<SnakeSegment>>
+    mut query_snake: Query<(&mut Position, &SnakeSegment)>
 ) {    
     // Return early if there is no single `MoveManager` component
     let mut move_manager = match query_move.get_single_mut() {
@@ -108,33 +108,39 @@ fn check_movement(
     //THE NEW MOVE IS THE OLD NEXT DIR
     move_manager.dir = move_manager.next_dir;
 
-    info!("Inside check_movement with MoveManager: {:?}", move_manager);
-    // Collect all segments into a vector
+    // Collect all segments into a vector and sort by index in ascending order
     let mut segments: Vec<_> = query_snake.iter_mut().collect();
-    // Sort the segments by index in descending order (last to first)
-    segments.sort_by(|(_, idx_a), (_, idx_b)| idx_b.0.cmp(&idx_a.0)); // Sort by inner usize value
-    info!("SEGMENT: {:?}", segments);
-    // Now `segments` is ordered from last index to first index
-    for (mut position, index) in segments {
-        if index.0 == 0 {
-            match  move_manager.dir {
-                Dir::Left => position.x -= 1,
-                Dir::Right => position.x += 1,
-                Dir::Up => position.y -= 1,
-                Dir::Down => position.y += 1,
-            }
-        } 
-        else 
-        {
-            // Set position to the position of the segment ahead
-            let previous_index = index.0.saturating_sub(1);
-            if let Some((prev_position, _)) = segments.iter().find(|(_, idx)| idx.0 == previous_index) {
-                *position = *prev_position; // Update the current position to the previous one
-            }
-        }
-    }    
-}
+    segments.sort_by(|(_, idx_a), (_, idx_b)| idx_a.idx.cmp(&idx_b.idx)); // Sort by idx value
+  
+    // GetMutHead
+    let (head_position, _) = segments.get_mut(0).unwrap(); // Safe unwrap since we expect at least one segment
+    // OLD POS
+    let mut last_x = head_position.x;
+    let mut last_y = head_position.y;
 
+    match  move_manager.dir {
+        Dir::Left => head_position.x -= 1,
+        Dir::Right => head_position.x += 1,
+        Dir::Up => head_position.y -= 1,
+        Dir::Down => head_position.y += 1,
+    }
+
+    for (body_position, _) in segments.iter_mut()
+        .skip(1)  // Skip the head
+    {
+        // Save the current position
+        let curr_x = body_position.x;
+        let curr_y = body_position.y;
+  
+        // Update the body segment's position to the last position
+        body_position.x = last_x;
+        body_position.y = last_y;
+  
+        // Update last_x and last_y to the current position for the next segment
+        last_x = curr_x;
+        last_y = curr_y;
+    }
+  }
 
 fn apply_transform(
     window_query: Query<&Window, With<PrimaryWindow>>,

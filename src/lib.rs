@@ -1,7 +1,6 @@
 mod asset_tracking;
 pub mod audio;
 mod game;
-mod demo;
 #[cfg(feature = "dev")]
 mod dev_tools;
 mod screens;
@@ -59,7 +58,7 @@ impl Plugin for AppPlugin {
         app.add_plugins((
             asset_tracking::plugin,
             game::plugin,
-            demo::plugin,
+            //demo::plugin,
             screens::plugin,
             theme::plugin,
         ));

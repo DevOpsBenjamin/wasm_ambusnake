@@ -12,9 +12,8 @@ use crate::{
 
 #[derive(Component, Debug, Clone, Copy, PartialEq, Eq, Default, Reflect)]
 #[reflect(Component)]
-pub enum SnakeSegment {
-    # [default]Head,
-    Body,
+pub struct SnakeSegment {
+    pub idx: usize
 }
 
 #[derive(Component, Debug, Clone, Copy, PartialEq, Eq, Default, Reflect)]
@@ -47,14 +46,9 @@ impl Position {
     }
 }
 
-#[derive(Component, Debug, Clone, Copy, PartialEq, Eq, Default, Reflect)]
-#[reflect(Component)]
-pub struct Index(pub usize);
-
 pub(super) fn plugin(app: &mut App) {
     app.register_type::<SnakeSegment>();
     app.register_type::<Position>();
-    app.register_type::<Index>();
     app.load_resource::<SnakeAssets>();
 
     //HANDLE SNAKE
@@ -74,9 +68,30 @@ fn init_snake(
     spawn_segment( 
         &mut commands,        
         snake_assets.head.clone(),
-        SnakeSegment::Head,
+        SnakeSegment { idx: 0 },
         Position { x: 12, y: 7},
-        Index(0),
+        window_width,
+        window_height
+    );
+    add_body(commands, window_query, snake_assets, 1);
+}
+
+fn add_body(
+    mut commands: Commands,
+    window_query: Query<&Window, With<PrimaryWindow>>,
+    snake_assets: Res<SnakeAssets>,
+    idx: usize
+) {  
+    // Get the window size for coordinate conversion
+    let window = window_query.single();
+    let window_width = window.width();
+    let window_height = window.height();
+    //SPAWN BODY
+    spawn_segment( 
+        &mut commands,        
+        snake_assets.body.clone(),
+        SnakeSegment { idx },
+        Position { x: -50, y: -50},
         window_width,
         window_height
     );
@@ -93,19 +108,17 @@ fn delete_snake(
 
 fn spawn_segment(
     commands: &mut Commands,
-    segment_text: Handle<Image>,
-    segment_type: SnakeSegment,
+    segment_texture: Handle<Image>,
+    segment: SnakeSegment,
     initial_position: Position,
-    index: Index,
     window_width: f32,
     window_height: f32
 ) {
     commands.spawn((
-        segment_type,
+        segment,
         initial_position.clone(),
-        index,
         SpriteBundle {
-            texture: segment_text,
+            texture: segment_texture,
             transform: initial_position.to_trasnform(window_width, window_height),
             ..Default::default()
         },

@@ -1,19 +1,8 @@
 use std::time::Duration;
 
-use bevy::{
-    prelude::*,
-    render::texture::{ImageLoaderSettings, ImageSampler}, window::PrimaryWindow,
-};
+use bevy::prelude::*;
 
-use crate::{
-    game::snake::{
-        Index, 
-        Position, 
-        SnakeSegment
-    }, 
-    screens::Screen, 
-    AppSet
-};
+use crate::screens::Screen;
 
 pub(super) fn plugin(app: &mut App) {
     app.add_systems(OnEnter(Screen::Gameplay), init_difficulty);
