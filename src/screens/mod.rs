@@ -1,6 +1,6 @@
 //! The game's main screen states and transitions between them.
-mod highscore;
 mod gameplay;
+mod highscore;
 mod loading;
 mod splash;
 mod title;

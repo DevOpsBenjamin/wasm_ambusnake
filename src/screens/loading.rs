@@ -4,9 +4,9 @@
 use bevy::prelude::*;
 
 use crate::{
+    game::music::GameplayMusic,
     game::snake::SnakeAssets,
     game::window::LevelAssets,
-    game::music::GameplayMusic,
     screens::Screen,
     theme::{interaction::InteractionAssets, prelude::*},
 };

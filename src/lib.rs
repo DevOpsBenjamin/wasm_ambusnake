@@ -1,8 +1,8 @@
 mod asset_tracking;
 pub mod audio;
-mod game;
 #[cfg(feature = "dev")]
 mod dev_tools;
+mod game;
 mod screens;
 mod theme;
 

@@ -8,7 +8,7 @@ pub(super) fn plugin(app: &mut App) {
     app.add_systems(
         Update,
         return_to_title_screen
-            .run_if(in_state(Screen::Gameplay).and_then(input_just_pressed(KeyCode::Escape)))
+            .run_if(in_state(Screen::Gameplay).and_then(input_just_pressed(KeyCode::Escape))),
     );
 }
 

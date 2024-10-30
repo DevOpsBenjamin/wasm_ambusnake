@@ -1,13 +1,14 @@
 use bevy::{
     prelude::*,
-    render::texture::{ImageLoaderSettings, ImageSampler}, window::PrimaryWindow,
+    render::texture::{ImageLoaderSettings, ImageSampler},
+    window::PrimaryWindow,
 };
 
 use crate::{
-    asset_tracking::LoadResource, 
+    asset_tracking::LoadResource,
     game::{
+        level::{BG_HEIGHT, BG_WIDTH},
         snake::{Position, SnakeSegment},
-        level::{BG_WIDTH, BG_HEIGHT}
     },
     screens::Screen,
 };
@@ -34,13 +35,14 @@ pub(super) fn plugin(app: &mut App) {
     app.add_systems(Update, screen_update);
 }
 
-
-
 fn screen_update(
     mut last_size: ResMut<LastWindowSize>,
     window_query: Query<&Window, With<PrimaryWindow>>,
-    mut segment_query: Query<(&mut Transform, &Position), (With<SnakeSegment>, Without<LevelBackGround>)>,
-    mut bg_query: Query<&mut Transform, (With<LevelBackGround>, Without<SnakeSegment>)>
+    mut segment_query: Query<
+        (&mut Transform, &Position),
+        (With<SnakeSegment>, Without<LevelBackGround>),
+    >,
+    mut bg_query: Query<&mut Transform, (With<LevelBackGround>, Without<SnakeSegment>)>,
 ) {
     let window = window_query.single();
     let current_width = window.width();
@@ -64,16 +66,15 @@ fn screen_update(
 
     // Apply bg resize
     for mut transform in &mut bg_query {
-        transform.scale = Vec3::new(current_width/(BG_WIDTH as f32), current_height/(BG_HEIGHT as f32), 1.);
+        transform.scale = Vec3::new(
+            current_width / (BG_WIDTH as f32),
+            current_height / (BG_HEIGHT as f32),
+            1.,
+        );
     }
 }
 
-
-
-fn delete_bg(
-    mut commands: Commands,
-    query: Query<Entity, With<LevelBackGround>>,
-) {
+fn delete_bg(mut commands: Commands, query: Query<Entity, With<LevelBackGround>>) {
     for entity in query.iter() {
         commands.entity(entity).despawn();
     }
@@ -82,7 +83,7 @@ fn delete_bg(
 fn init_bg(
     mut commands: Commands,
     window_query: Query<&Window, With<PrimaryWindow>>,
-    snake_assets: Res<LevelAssets>
+    snake_assets: Res<LevelAssets>,
 ) {
     // Get the window size for coordinate conversion
     let window = window_query.single();
@@ -93,9 +94,13 @@ fn init_bg(
         LevelBackGround,
         SpriteBundle {
             texture: snake_assets.background.clone(),
-            transform: Transform{
+            transform: Transform {
                 translation: Vec3::new(0., 0., -1.),
-                scale: Vec3::new(window_width/(BG_WIDTH as f32), window_height/(BG_HEIGHT as f32), 1.),
+                scale: Vec3::new(
+                    window_width / (BG_WIDTH as f32),
+                    window_height / (BG_HEIGHT as f32),
+                    1.,
+                ),
                 ..Default::default()
             },
             ..Default::default()
@@ -107,7 +112,7 @@ fn init_bg(
 #[derive(Resource, Asset, Reflect, Clone)]
 pub struct LevelAssets {
     #[dependency]
-    pub background: Handle<Image>
+    pub background: Handle<Image>,
 }
 impl LevelAssets {
     pub const PATH_BG: &'static str = "images/SnakeBg.png"; // Use your PNG path here
@@ -122,7 +127,7 @@ impl FromWorld for LevelAssets {
                     // Use `nearest` image sampling to preserve the pixel art style.
                     settings.sampler = ImageSampler::nearest();
                 },
-            )
+            ),
         }
     }
 }
