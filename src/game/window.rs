@@ -59,7 +59,7 @@ fn screen_update(
 
     // Apply snake resize
     for (mut transform, position) in &mut segment_query {
-        let new_transform = position.to_trasnform(current_width, current_height);
+        let new_transform = position.world_transform(current_width, current_height);
         transform.translation = new_transform.translation;
         transform.scale = new_transform.scale;
     }

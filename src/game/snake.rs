@@ -23,7 +23,7 @@ pub struct Position {
     pub y: i16,
 }
 impl Position {
-    pub fn to_trasnform(&self, window_width: f32, window_height: f32) -> Transform {
+    pub fn world_transform(&self, window_width: f32, window_height: f32) -> Transform {
         let box_width_size = window_width / (BOX_COUNT_WIDTH as f32);
         let box_height_size = window_height / (BOX_COUNT_HEIGHT as f32);
 
@@ -117,10 +117,10 @@ fn spawn_segment(
 ) {
     commands.spawn((
         segment,
-        initial_position.clone(),
+        initial_position,
         SpriteBundle {
             texture: segment_texture,
-            transform: initial_position.to_trasnform(window_width, window_height),
+            transform: initial_position.world_transform(window_width, window_height),
             ..Default::default()
         },
     ));

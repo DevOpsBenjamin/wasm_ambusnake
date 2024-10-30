@@ -152,7 +152,7 @@ fn apply_transform(
 
     // Apply snake MOVe
     for (mut transform, position) in &mut segment_query {
-        let new_transform = position.to_trasnform(current_width, current_height);
+        let new_transform = position.world_transform(current_width, current_height);
         transform.translation = new_transform.translation;
     }
 }
