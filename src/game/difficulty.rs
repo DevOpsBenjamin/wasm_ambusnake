@@ -1,19 +1,56 @@
 use std::time::Duration;
 
-#[derive(Clone, Copy)]
-#[derive(Debug)]
+use bevy::{
+    prelude::*,
+    render::texture::{ImageLoaderSettings, ImageSampler}, window::PrimaryWindow,
+};
+
+use crate::{
+    game::snake::{
+        Index, 
+        Position, 
+        SnakeSegment
+    }, 
+    screens::Screen, 
+    AppSet
+};
+
+pub(super) fn plugin(app: &mut App) {
+    app.add_systems(OnEnter(Screen::Gameplay), init_difficulty);
+    app.add_systems(OnExit(Screen::Gameplay), delete_difficulty);
+}
+
+
+fn init_difficulty(
+    mut commands: Commands
+) {
+    commands.spawn(get_difficulty_data(DifficultyLevel::default()));
+}
+
+fn delete_difficulty(
+    mut commands: Commands,
+    query: Query<Entity, With<Difficulty>>,
+) {
+    for entity in query.iter() {
+        commands.entity(entity).despawn();
+    }
+}
+
+#[derive(Component, Debug, Clone, Copy, PartialEq, Eq, Default, Reflect)]
+#[reflect(Component)]
 pub enum DifficultyLevel 
 {
-    Easy,
+    #[default] Easy,
     Medium,
     Hard,
     Insane
 }
 
-#[derive(Clone, Copy)]
+#[derive(Component, Debug, Clone, Copy, PartialEq, Eq, Default, Reflect)]
+#[reflect(Component)]
 pub struct Difficulty 
 {
-    move_duration: Duration,
+    pub move_duration: Duration,
     score_per_bonus:i32,
     bonus_count:i16,
     level:DifficultyLevel,

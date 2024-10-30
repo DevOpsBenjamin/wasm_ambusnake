@@ -6,7 +6,6 @@ use bevy::{
 use crate::{
     asset_tracking::LoadResource,
     game::level::{BOX_SIZE, BOX_COUNT_WIDTH,BOX_COUNT_HEIGHT},
-    //demo::movement::{MovementController, ScreenWrap},
     screens::Screen
 };
 
@@ -21,8 +20,8 @@ pub enum SnakeSegment {
 #[derive(Component, Debug, Clone, Copy, PartialEq, Eq, Default, Reflect)]
 #[reflect(Component)]
 pub struct Position {
-    x: i16,
-    y: i16,
+    pub x: i16,
+    pub y: i16,
 }
 impl Position {
     pub fn to_trasnform(&self, window_width: f32, window_height: f32) -> Transform {
@@ -50,7 +49,7 @@ impl Position {
 
 #[derive(Component, Debug, Clone, Copy, PartialEq, Eq, Default, Reflect)]
 #[reflect(Component)]
-struct Index(usize);
+pub struct Index(pub usize);
 
 pub(super) fn plugin(app: &mut App) {
     app.register_type::<SnakeSegment>();
@@ -59,42 +58,8 @@ pub(super) fn plugin(app: &mut App) {
     app.load_resource::<SnakeAssets>();
 
     //HANDLE SNAKE
-    app.add_systems(OnEnter(Screen::Gameplay), debug_grid);
     app.add_systems(OnEnter(Screen::Gameplay), init_snake);
     app.add_systems(OnExit(Screen::Gameplay), delete_snake);
-}
-
-fn debug_grid(
-    mut commands: Commands,
-    window_query: Query<&Window, With<PrimaryWindow>>,
-    snake_assets: Res<SnakeAssets>,
-) {
-    // Get the window size for coordinate conversion
-    let window = window_query.single();
-    let window_width = window.width();
-    let window_height = window.height();
-
-    // Loop through the defined width and height to spawn segments
-    for x in 0..BOX_COUNT_WIDTH {
-        for y in 0..BOX_COUNT_HEIGHT {
-            // Determine whether to spawn a segment (checkerboard pattern)
-            if (x + y) % 2 == 0 { // Change this condition to achieve different patterns
-                // Determine the position for this grid segment
-                let position = Position { x, y };
-
-                // Spawn the segment
-                spawn_segment(
-                    &mut commands,        
-                    snake_assets.body.clone(),
-                    SnakeSegment::Body, // Change as needed for different segment types
-                    Position { x: position.x, y: position.y },
-                    Index(0),
-                    window_width,
-                    window_height
-                );
-            }
-        }
-    }
 }
 
 fn init_snake(

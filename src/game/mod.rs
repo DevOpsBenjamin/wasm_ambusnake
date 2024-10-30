@@ -16,6 +16,8 @@ pub mod snake;
 pub(super) fn plugin(app: &mut App) {
     app.add_plugins((
         snake::plugin,
+        movement::plugin,
+        difficulty::plugin,
         music::plugin,
         window::plugin,
     ));
