@@ -128,11 +128,9 @@ fn check_movement(
         {
             // Set position to the position of the segment ahead
             let previous_index = index.0.saturating_sub(1);
-            /* 
             if let Some((prev_position, _)) = segments.iter().find(|(_, idx)| idx.0 == previous_index) {
                 *position = *prev_position; // Update the current position to the previous one
             }
-            */
         }
     }    
 }
@@ -140,7 +138,7 @@ fn check_movement(
 
 fn apply_transform(
     window_query: Query<&Window, With<PrimaryWindow>>,
-    mut query_move: Query<&MoveManager>,
+    query_move: Query<&MoveManager>,
     mut segment_query: Query<(&mut Transform, &Position), With<SnakeSegment>>
 ) {    
     // Return early if there is no single `MoveManager` component
