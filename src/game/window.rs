@@ -122,7 +122,7 @@ impl FromWorld for LevelAssets {
                 LevelAssets::PATH_BG,
                 |settings: &mut ImageLoaderSettings| {
                     // Use `nearest` image sampling to preserve the pixel art style.
-                    settings.sampler = ImageSampler::nearest();
+                    settings.sampler = ImageSampler::linear();
                 },
             ),
         }

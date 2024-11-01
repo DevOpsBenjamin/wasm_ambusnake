@@ -72,7 +72,7 @@ fn spawn_splash_screen(mut commands: Commands, asset_server: Res<AssetServer>) {
                         |settings: &mut ImageLoaderSettings| {
                             // Make an exception for the splash image in case
                             // `ImagePlugin::default_nearest()` is used for pixel art.
-                            settings.sampler = ImageSampler::nearest();
+                            settings.sampler = ImageSampler::linear();
                         },
                     )),
                     ..default()

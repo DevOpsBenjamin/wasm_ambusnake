@@ -3,7 +3,11 @@
 
 use ambu_snake::AppPlugin;
 use bevy::prelude::*;
+use bevy_egui::EguiPlugin;
 
 fn main() -> AppExit {
-    App::new().add_plugins(AppPlugin).run()
+    App::new()
+        .add_plugins(AppPlugin)
+        .add_plugins(EguiPlugin)
+        .run()
 }

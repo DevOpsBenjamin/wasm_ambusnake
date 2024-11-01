@@ -150,14 +150,14 @@ impl FromWorld for SnakeAssets {
                 SnakeAssets::PATH_HEAD,
                 |settings: &mut ImageLoaderSettings| {
                     // Use `nearest` image sampling to preserve the pixel art style.
-                    settings.sampler = ImageSampler::nearest();
+                    settings.sampler = ImageSampler::linear();
                 },
             ),
             body: assets.load_with_settings(
                 SnakeAssets::PATH_BODY,
                 |settings: &mut ImageLoaderSettings| {
                     // Use `nearest` image sampling to preserve the pixel art style.
-                    settings.sampler = ImageSampler::nearest();
+                    settings.sampler = ImageSampler::linear();
                 },
             ),
         }

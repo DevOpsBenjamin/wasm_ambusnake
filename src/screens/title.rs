@@ -1,35 +1,39 @@
 //! The title screen that appears when the game starts.
 
 use bevy::prelude::*;
+use bevy_egui::{egui, EguiContexts};
 
-use crate::{screens::Screen, theme::prelude::*};
+use crate::screens::Screen;
 
 pub(super) fn plugin(app: &mut App) {
-    app.add_systems(OnEnter(Screen::Title), spawn_title_screen);
+    app.add_systems(Update, show_title_screen.run_if(in_state(Screen::Title)));
 }
 
-fn spawn_title_screen(mut commands: Commands) {
-    commands
-        .ui_root()
-        .insert(StateScoped(Screen::Title))
-        .with_children(|children| {
-            children.button("Play").observe(enter_gameplay_screen);
-            children.button("HighScore").observe(enter_highscore_screen);
+// Our `egui` title screen function to replace `spawn_title_screen`
+fn show_title_screen(
+    mut egui_context: EguiContexts,
+    mut next_screen: ResMut<NextState<Screen>>,
+    mut app_exit: EventWriter<AppExit>,
+) {
+    egui::CentralPanel::default().show(egui_context.ctx_mut(), |ui| {
+        ui.vertical_centered(|ui| {
+            ui.heading("My Game");
 
+            // Play Button
+            if ui.button("Play").clicked() {
+                next_screen.set(Screen::Gameplay);
+            }
+
+            // High Score Button
+            if ui.button("HighScore").clicked() {
+                next_screen.set(Screen::HighScore);
+            }
+
+            // Exit Button, not available for Web
             #[cfg(not(target_family = "wasm"))]
-            children.button("Exit").observe(exit_app);
+            if ui.button("Exit").clicked() {
+                app_exit.send(AppExit::Success);
+            }
         });
-}
-
-fn enter_gameplay_screen(_trigger: Trigger<OnPress>, mut next_screen: ResMut<NextState<Screen>>) {
-    next_screen.set(Screen::Gameplay);
-}
-
-fn enter_highscore_screen(_trigger: Trigger<OnPress>, mut next_screen: ResMut<NextState<Screen>>) {
-    next_screen.set(Screen::HighScore);
-}
-
-#[cfg(not(target_family = "wasm"))]
-fn exit_app(_trigger: Trigger<OnPress>, mut app_exit: EventWriter<AppExit>) {
-    app_exit.send(AppExit::Success);
+    });
 }
