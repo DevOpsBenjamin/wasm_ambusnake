@@ -5,15 +5,15 @@ use bevy::prelude::*;
 use bevy_egui::{egui, EguiContexts};
 
 use crate::{
-    game::bonus::BonusAssets,
-    game::music::GameplayMusic,
-    game::snake::SnakeAssets,
-    game::window::LevelAssets,
-    screens::Screen,
+    game::bonus::BonusAssets, game::music::GameplayMusic, game::snake::SnakeAssets,
+    game::window::LevelAssets, screens::Screen,
 };
 
 pub(super) fn plugin(app: &mut App) {
-    app.add_systems(Update, show_loading_screen.run_if(in_state(Screen::Loading)));
+    app.add_systems(
+        Update,
+        show_loading_screen.run_if(in_state(Screen::Loading)),
+    );
 
     app.add_systems(
         Update,
@@ -21,9 +21,7 @@ pub(super) fn plugin(app: &mut App) {
     );
 }
 
-fn show_loading_screen(
-    mut egui_context: EguiContexts,
-) {
+fn show_loading_screen(mut egui_context: EguiContexts) {
     egui::CentralPanel::default().show(egui_context.ctx_mut(), |ui| {
         // Adding padding around the panel
         ui.add_space(50.0);

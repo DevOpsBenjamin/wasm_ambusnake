@@ -54,11 +54,7 @@ impl Plugin for AppPlugin {
         );
 
         // Add other plugins.
-        app.add_plugins((
-            asset_tracking::plugin,
-            game::plugin,
-            screens::plugin,
-        ));
+        app.add_plugins((asset_tracking::plugin, game::plugin, screens::plugin));
 
         // Enable dev tools for dev builds.
         #[cfg(feature = "dev")]
