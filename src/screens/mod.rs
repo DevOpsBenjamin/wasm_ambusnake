@@ -1,4 +1,5 @@
 //! The game's main screen states and transitions between them.
+mod death;
 mod gameplay;
 mod highscore;
 mod loading;
@@ -14,6 +15,7 @@ pub(super) fn plugin(app: &mut App) {
     app.add_plugins((
         highscore::plugin,
         gameplay::plugin,
+        death::plugin,
         loading::plugin,
         splash::plugin,
         title::plugin,
@@ -29,4 +31,5 @@ pub enum Screen {
     Title,
     HighScore,
     Gameplay,
+    Death,
 }

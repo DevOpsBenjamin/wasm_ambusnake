@@ -1,5 +1,7 @@
 use bevy::prelude::*;
 
+use crate::{game::snake::SnakeSegment, screens::Screen, AppSet};
+
 pub const BOX_SIZE: i16 = 64;
 pub const BG_WIDTH: i16 = 1600;
 pub const BG_HEIGHT: i16 = 896;
@@ -8,6 +10,47 @@ pub const BOX_COUNT_HEIGHT: i16 = BG_HEIGHT / BOX_SIZE;
 
 pub(super) fn plugin(app: &mut App) {
     app.register_type::<Position>();
+
+    app.add_systems(
+        Update,
+        death_check
+            .in_set(AppSet::Update)
+            .run_if(in_state(Screen::Gameplay)),
+    );
+}
+
+fn death_check(
+    mut next_screen: ResMut<NextState<Screen>>,
+    query_snake: Query<(&Position, &SnakeSegment)>,
+) {
+    // Find the head segment with idx == 0, return early if not found
+    let head_position = match query_snake.iter().find_map(|(position, segment)| {
+        if segment.idx == 0 {
+            Some(position)
+        } else {
+            None
+        }
+    }) {
+        Some(position) => position,
+        None => return,
+    };
+
+    if head_position.x < 0
+        || head_position.x > BOX_COUNT_WIDTH - 1
+        || head_position.y < 0
+        || head_position.y > BOX_COUNT_HEIGHT - 1
+    {
+        next_screen.set(Screen::Death);
+    }
+
+    for (pos, segment) in query_snake.iter() {
+        if segment.idx == 0 {
+            continue;
+        }
+        if head_position.x == pos.x && head_position.y == pos.y {
+            next_screen.set(Screen::Death);
+        }
+    }
 }
 
 #[derive(Component, Debug, Clone, Copy, PartialEq, Eq, Default, Reflect)]

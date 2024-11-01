@@ -109,7 +109,7 @@ fn check_movement(
     move_manager.update_duration(difficulty.move_duration);
     //THE NEW MOVE IS THE OLD NEXT DIR
     move_manager.dir = move_manager.next_dir;
-    
+
     // Collect all segments into a vector and sort by index in ascending order
     let mut segments: Vec<_> = query_snake.iter_mut().collect();
     // Sort by idx value
@@ -175,9 +175,9 @@ fn apply_rotation(
     head_transform.rotation = get_rotation_from_dir(move_manager.dir);
 }
 
-fn get_rotation_from_dir(dir: Dir) -> Quat {    
+fn get_rotation_from_dir(dir: Dir) -> Quat {
     match dir {
-        Dir::Up => Quat::from_rotation_z(0.0),            // 0 degrees (0 radians)
+        Dir::Up => Quat::from_rotation_z(0.0), // 0 degrees (0 radians)
         Dir::Left => Quat::from_rotation_z(std::f32::consts::FRAC_PI_2), // 90 degrees (π/2 radians)
         Dir::Down => Quat::from_rotation_z(std::f32::consts::PI), // 180 degrees (π radians)
         Dir::Right => Quat::from_rotation_z(std::f32::consts::FRAC_PI_2 * 3.0), // 270 degrees (3π/2 radians)
