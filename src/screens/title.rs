@@ -15,23 +15,27 @@ fn show_title_screen(
     mut app_exit: EventWriter<AppExit>,
 ) {
     egui::CentralPanel::default().show(egui_context.ctx_mut(), |ui| {
+        // Adding padding around the panel
+        ui.add_space(50.0);
+
         ui.vertical_centered(|ui| {
-            // Set larger font for the title
-            ui.add_space(100.0); // Adjust space above if needed
+            // Title with larger font size
+            ui.add_space(80.0); // Adjust space above the title if needed
             ui.label(
                 egui::RichText::new("AmbuSnake")
-                    .size(70.0) // Larger font size for title
+                    .size(80.0) // Larger font size for title
                     .strong(),
             );
 
-            ui.add_space(50.0); // Space between title and buttons
+            // Additional space between the title and buttons
+            ui.add_space(70.0);
 
-            // Larger buttons with custom text size
+            // Adjusted button group alignment with spacing in between
             if ui
                 .add_sized(
-                    [200.0, 70.0],
+                    [220.0, 80.0],
                     egui::Button::new(
-                        egui::RichText::new("Play").size(30.0), // Larger font for button text
+                        egui::RichText::new("Play").size(35.0), // Adjusted font size
                     ),
                 )
                 .clicked()
@@ -39,11 +43,13 @@ fn show_title_screen(
                 next_screen.set(Screen::Gameplay);
             }
 
+            ui.add_space(15.0); // Spacing between buttons
+
             if ui
                 .add_sized(
-                    [200.0, 70.0],
+                    [220.0, 80.0],
                     egui::Button::new(
-                        egui::RichText::new("HighScore").size(30.0), // Larger font for button text
+                        egui::RichText::new("HighScore").size(35.0),
                     ),
                 )
                 .clicked()
@@ -52,17 +58,23 @@ fn show_title_screen(
             }
 
             #[cfg(not(target_family = "wasm"))]
-            if ui
-                .add_sized(
-                    [200.0, 70.0],
-                    egui::Button::new(
-                        egui::RichText::new("Exit").size(30.0), // Larger font for button text
-                    ),
-                )
-                .clicked()
             {
-                app_exit.send(AppExit::Success);
+                ui.add_space(15.0); // Spacing between buttons
+                if ui
+                    .add_sized(
+                        [220.0, 80.0],
+                        egui::Button::new(
+                            egui::RichText::new("Exit").size(35.0),
+                        ),
+                    )
+                    .clicked()
+                {
+                    app_exit.send(AppExit::Success);
+                }
             }
+
+            // Adding padding below the button group
+            ui.add_space(50.0);
         });
     });
 }
