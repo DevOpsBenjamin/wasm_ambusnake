@@ -4,60 +4,41 @@ use bevy::{
     window::PrimaryWindow,
 };
 
-use crate::{
-    asset_tracking::LoadResource,
-    game::level::{BOX_COUNT_HEIGHT, BOX_COUNT_WIDTH, BOX_SIZE},
-    screens::Screen,
-};
-
-#[derive(Component, Debug, Clone, Copy, PartialEq, Eq, Default, Reflect)]
-#[reflect(Component)]
-pub struct SnakeSegment {
-    pub idx: usize,
-}
-
-#[derive(Component, Debug, Clone, Copy, PartialEq, Eq, Default, Reflect)]
-#[reflect(Component)]
-pub struct Position {
-    pub x: i16,
-    pub y: i16,
-}
-impl Position {
-    pub fn world_transform(&self, window_width: f32, window_height: f32) -> Transform {
-        let box_width_size = window_width / (BOX_COUNT_WIDTH as f32);
-        let box_height_size = window_height / (BOX_COUNT_HEIGHT as f32);
-
-        // Calculate the center offset for translation
-        let center_offset_x = box_width_size / 2.0;
-        let center_offset_y = box_height_size / 2.0;
-
-        let screen_pos_x = (self.x as f32 * box_width_size) - (window_width / 2.0);
-        let screen_pos_y = (window_height / 2.0) - (self.y as f32 * box_height_size);
-
-        Transform {
-            translation: Vec3::new(
-                screen_pos_x + center_offset_x, // Shift X to center the origin
-                screen_pos_y - center_offset_y, // Shift Y to center the origin
-                0.0,
-            ),
-            scale: Vec3::new(
-                box_width_size / (BOX_SIZE as f32),
-                box_height_size / (BOX_SIZE as f32),
-                1.0,
-            ),
-            ..Default::default()
-        }
-    }
-}
+use crate::{asset_tracking::LoadResource, game::level::Position, screens::Screen, AppSet};
 
 pub(super) fn plugin(app: &mut App) {
     app.register_type::<SnakeSegment>();
-    app.register_type::<Position>();
     app.load_resource::<SnakeAssets>();
 
     //HANDLE SNAKE
     app.add_systems(OnEnter(Screen::Gameplay), init_snake);
     app.add_systems(OnExit(Screen::Gameplay), delete_snake);
+    app.add_systems(
+        Update,
+        snake_grower
+            .in_set(AppSet::Update)
+            .run_if(in_state(Screen::Gameplay)),
+    );
+}
+
+fn snake_grower(
+    commands: Commands,
+    snake_assets: Res<SnakeAssets>,
+    mut snake_query: Query<&mut SnakeManager>,
+    query_segments: Query<&SnakeSegment>,
+    window_query: Query<&Window, With<PrimaryWindow>>,
+) {
+    // Return early if there is no single `SnakeManager` component
+    let mut snake_manager = match snake_query.get_single_mut() {
+        Ok(snake_manager) => snake_manager,
+        Err(_) => return,
+    };
+
+    if snake_manager.should_grow {
+        let idx = query_segments.iter().count();
+        snake_manager.should_grow = false;
+        add_body(commands, window_query, snake_assets, idx);
+    }
 }
 
 fn init_snake(
@@ -65,6 +46,7 @@ fn init_snake(
     window_query: Query<&Window, With<PrimaryWindow>>,
     snake_assets: Res<SnakeAssets>,
 ) {
+    commands.spawn(SnakeManager { should_grow: false });
     // Get the window size for coordinate conversion
     let window = window_query.single();
     let window_width = window.width();
@@ -73,7 +55,7 @@ fn init_snake(
         &mut commands,
         snake_assets.head.clone(),
         SnakeSegment { idx: 0 },
-        Position { x: 12, y: 7 },
+        Position { x: 12, y: 7, z: 1 },
         window_width,
         window_height,
     );
@@ -95,14 +77,25 @@ fn add_body(
         &mut commands,
         snake_assets.body.clone(),
         SnakeSegment { idx },
-        Position { x: -50, y: -50 },
+        Position {
+            x: -50,
+            y: -50,
+            z: 1,
+        },
         window_width,
         window_height,
     );
 }
 
-fn delete_snake(mut commands: Commands, query: Query<Entity, With<SnakeSegment>>) {
-    for entity in query.iter() {
+fn delete_snake(
+    mut commands: Commands,
+    query_segment: Query<Entity, With<SnakeSegment>>,
+    query_manager: Query<Entity, With<SnakeManager>>,
+) {
+    for entity in query_segment.iter() {
+        commands.entity(entity).despawn();
+    }
+    for entity in query_manager.iter() {
         commands.entity(entity).despawn();
     }
 }
@@ -124,6 +117,18 @@ fn spawn_segment(
             ..Default::default()
         },
     ));
+}
+
+#[derive(Component, Debug, Clone, Copy, PartialEq, Eq, Default, Reflect)]
+#[reflect(Component)]
+pub struct SnakeManager {
+    pub should_grow: bool,
+}
+
+#[derive(Component, Debug, Clone, Copy, PartialEq, Eq, Default, Reflect)]
+#[reflect(Component)]
+pub struct SnakeSegment {
+    pub idx: usize,
 }
 
 //ASSET ZONE

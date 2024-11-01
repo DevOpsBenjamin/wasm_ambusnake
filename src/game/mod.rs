@@ -5,20 +5,24 @@
 
 use bevy::prelude::*;
 
-mod bonus;
+pub mod bonus;
 mod difficulty;
 mod level;
 mod movement;
 pub mod music;
+mod score;
 pub mod snake;
 pub mod window;
 
 pub(super) fn plugin(app: &mut App) {
     app.add_plugins((
+        bonus::plugin,
+        level::plugin,
         snake::plugin,
         movement::plugin,
         difficulty::plugin,
         music::plugin,
         window::plugin,
+        score::plugin,
     ));
 }

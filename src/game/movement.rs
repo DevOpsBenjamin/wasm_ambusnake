@@ -3,10 +3,7 @@ use bevy::{prelude::*, window::PrimaryWindow};
 use std::time::Duration;
 
 use crate::{
-    game::{
-        difficulty::Difficulty,
-        snake::{Position, SnakeSegment},
-    },
+    game::{difficulty::Difficulty, level::Position, snake::SnakeSegment},
     screens::Screen,
     AppSet,
 };
@@ -15,13 +12,24 @@ pub(super) fn plugin(app: &mut App) {
     app.add_systems(OnEnter(Screen::Gameplay), init_move);
     app.add_systems(OnExit(Screen::Gameplay), delete_move);
 
-    app.add_systems(Update, update_timer.in_set(AppSet::TickTimers));
-    app.add_systems(Update, check_input.in_set(AppSet::RecordInput));
+    app.add_systems(
+        Update,
+        update_timer
+            .in_set(AppSet::TickTimers)
+            .run_if(in_state(Screen::Gameplay)),
+    );
+    app.add_systems(
+        Update,
+        check_input
+            .in_set(AppSet::RecordInput)
+            .run_if(in_state(Screen::Gameplay)),
+    );
     app.add_systems(
         Update,
         (check_movement, apply_transform)
             .chain()
-            .in_set(AppSet::Update),
+            .in_set(AppSet::Update)
+            .run_if(in_state(Screen::Gameplay)),
     );
 }
 

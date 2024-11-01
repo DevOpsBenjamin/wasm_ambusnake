@@ -7,8 +7,8 @@ use bevy::{
 use crate::{
     asset_tracking::LoadResource,
     game::{
-        level::{BG_HEIGHT, BG_WIDTH},
-        snake::{Position, SnakeSegment},
+        level::{Position, BG_HEIGHT, BG_WIDTH},
+        snake::SnakeSegment,
     },
     screens::Screen,
 };
@@ -38,10 +38,7 @@ pub(super) fn plugin(app: &mut App) {
 fn screen_update(
     mut last_size: ResMut<LastWindowSize>,
     window_query: Query<&Window, With<PrimaryWindow>>,
-    mut segment_query: Query<
-        (&mut Transform, &Position),
-        (With<SnakeSegment>, Without<LevelBackGround>),
-    >,
+    mut object_query: Query<(&mut Transform, &Position), Without<LevelBackGround>>,
     mut bg_query: Query<&mut Transform, (With<LevelBackGround>, Without<SnakeSegment>)>,
 ) {
     let window = window_query.single();
@@ -58,7 +55,7 @@ fn screen_update(
     last_size.height = current_height;
 
     // Apply snake resize
-    for (mut transform, position) in &mut segment_query {
+    for (mut transform, position) in &mut object_query {
         let new_transform = position.world_transform(current_width, current_height);
         transform.translation = new_transform.translation;
         transform.scale = new_transform.scale;
