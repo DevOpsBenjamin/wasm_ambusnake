@@ -21,23 +21,29 @@ fn show_title_screen(
             ui.add_space(100.0); // Adjust space above if needed
             ui.label(
                 egui::RichText::new("My Game")
-                    .size(50.0) // Larger font size
+                    .size(70.0) // Larger font size for title
                     .strong(),
             );
 
             ui.add_space(50.0); // Space between title and buttons
 
-            // Larger buttons with more spacing
-            if ui.add_sized([200.0, 60.0], egui::Button::new("Play")).clicked() {
+            // Larger buttons with custom text size
+            if ui.add_sized([200.0, 70.0], egui::Button::new(
+                egui::RichText::new("Play").size(30.0) // Larger font for button text
+            )).clicked() {
                 next_screen.set(Screen::Gameplay);
             }
 
-            if ui.add_sized([200.0, 60.0], egui::Button::new("HighScore")).clicked() {
+            if ui.add_sized([200.0, 70.0], egui::Button::new(
+                egui::RichText::new("HighScore").size(30.0) // Larger font for button text
+            )).clicked() {
                 next_screen.set(Screen::HighScore);
             }
 
             #[cfg(not(target_family = "wasm"))]
-            if ui.add_sized([200.0, 60.0], egui::Button::new("Exit")).clicked() {
+            if ui.add_sized([200.0, 70.0], egui::Button::new(
+                egui::RichText::new("Exit").size(30.0) // Larger font for button text
+            )).clicked() {
                 app_exit.send(AppExit::Success);
             }
         });
