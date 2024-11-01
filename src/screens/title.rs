@@ -19,7 +19,7 @@ fn show_title_screen(
             // Set larger font for the title
             ui.add_space(100.0); // Adjust space above if needed
             ui.label(
-                egui::RichText::new("My Game")
+                egui::RichText::new("AmbuSnake")
                     .size(70.0) // Larger font size for title
                     .strong(),
             );
