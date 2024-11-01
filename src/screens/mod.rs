@@ -3,7 +3,6 @@ mod death;
 mod gameplay;
 mod highscore;
 mod loading;
-mod splash;
 mod title;
 
 use bevy::prelude::*;
@@ -17,7 +16,6 @@ pub(super) fn plugin(app: &mut App) {
         gameplay::plugin,
         death::plugin,
         loading::plugin,
-        splash::plugin,
         title::plugin,
     ));
 }
@@ -26,7 +24,6 @@ pub(super) fn plugin(app: &mut App) {
 #[derive(States, Debug, Hash, PartialEq, Eq, Clone, Default)]
 pub enum Screen {
     #[default]
-    Splash,
     Loading,
     Title,
     HighScore,

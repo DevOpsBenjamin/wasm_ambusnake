@@ -2,6 +2,7 @@
 //! This reduces stuttering, especially for audio on WASM.
 
 use bevy::prelude::*;
+use bevy_egui::{egui, EguiContexts};
 
 use crate::{
     game::bonus::BonusAssets,
@@ -9,11 +10,10 @@ use crate::{
     game::snake::SnakeAssets,
     game::window::LevelAssets,
     screens::Screen,
-    theme::{interaction::InteractionAssets, prelude::*},
 };
 
 pub(super) fn plugin(app: &mut App) {
-    app.add_systems(OnEnter(Screen::Loading), spawn_loading_screen);
+    app.add_systems(Update, show_loading_screen.run_if(in_state(Screen::Loading)));
 
     app.add_systems(
         Update,
@@ -21,16 +21,26 @@ pub(super) fn plugin(app: &mut App) {
     );
 }
 
-fn spawn_loading_screen(mut commands: Commands) {
-    commands
-        .ui_root()
-        .insert(StateScoped(Screen::Loading))
-        .with_children(|children| {
-            children.label("Loading...").insert(Style {
-                justify_content: JustifyContent::Center,
-                ..default()
-            });
+fn show_loading_screen(
+    mut egui_context: EguiContexts,
+) {
+    egui::CentralPanel::default().show(egui_context.ctx_mut(), |ui| {
+        // Adding padding around the panel
+        ui.add_space(50.0);
+
+        ui.vertical_centered(|ui| {
+            // Highscore title with larger font size
+            ui.add_space(80.0); // Adjust space above the title if needed
+            ui.label(
+                egui::RichText::new("Loading...")
+                    .size(60.0) // Larger font size for highscore title
+                    .strong(),
+            );
+
+            // Additional space between the title and score entries
+            ui.add_space(30.0);
         });
+    });
 }
 
 fn continue_to_title_screen(mut next_screen: ResMut<NextState<Screen>>) {
@@ -41,12 +51,10 @@ fn all_assets_loaded(
     snake_assets: Option<Res<SnakeAssets>>,
     bonus_assets: Option<Res<BonusAssets>>,
     level_assets: Option<Res<LevelAssets>>,
-    interaction_assets: Option<Res<InteractionAssets>>,
     gameplay_music: Option<Res<GameplayMusic>>,
 ) -> bool {
     snake_assets.is_some()
         && bonus_assets.is_some()
         && level_assets.is_some()
-        && interaction_assets.is_some()
         && gameplay_music.is_some()
 }

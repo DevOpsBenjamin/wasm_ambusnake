@@ -4,7 +4,6 @@ pub mod audio;
 mod dev_tools;
 mod game;
 mod screens;
-mod theme;
 
 use bevy::{
     asset::AssetMetaCheck,
@@ -59,7 +58,6 @@ impl Plugin for AppPlugin {
             asset_tracking::plugin,
             game::plugin,
             screens::plugin,
-            theme::plugin,
         ));
 
         // Enable dev tools for dev builds.
