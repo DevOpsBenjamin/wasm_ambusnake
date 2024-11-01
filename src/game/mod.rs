@@ -10,7 +10,7 @@ mod difficulty;
 mod level;
 mod movement;
 pub mod music;
-mod score;
+pub mod score;
 pub mod snake;
 pub mod window;
 

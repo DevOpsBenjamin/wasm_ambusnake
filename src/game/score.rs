@@ -4,7 +4,7 @@ use crate::screens::Screen;
 
 pub(super) fn plugin(app: &mut App) {
     app.add_systems(OnEnter(Screen::Title), setup_score_manager);
-    app.add_systems(OnExit(Screen::Gameplay), reset_score);
+    app.add_systems(OnEnter(Screen::Gameplay), reset_score);
 }
 
 // Setup the `ScoreManager` on entering the Title screen only if it doesn’t already exist

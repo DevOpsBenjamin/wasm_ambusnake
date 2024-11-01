@@ -58,7 +58,6 @@ impl Plugin for AppPlugin {
         app.add_plugins((
             asset_tracking::plugin,
             game::plugin,
-            //demo::plugin,
             screens::plugin,
             theme::plugin,
         ));

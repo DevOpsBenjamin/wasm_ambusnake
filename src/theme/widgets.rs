@@ -14,6 +14,9 @@ pub trait Widgets {
 
     /// Spawn a simple text label.
     fn label(&mut self, text: impl Into<String>) -> EntityCommands;
+
+    /// Spawn a simple input field.
+    fn input(&mut self, text: impl Into<String>) -> EntityCommands;
 }
 
 impl<T: Spawn> Widgets for T {
@@ -103,6 +106,47 @@ impl<T: Spawn> Widgets for T {
         ));
         entity
     }
+
+    fn input(&mut self, text: impl Into<String>) -> EntityCommands {
+        let placeholder = text.into();
+
+        // Spawn a container with TextInput component and style
+        let mut entity = self.spawn((
+            Name::new("TextInput"),
+            TextInput {
+                text: String::new(),
+                placeholder: placeholder.clone(),
+            },
+            NodeBundle {
+                style: Style {
+                    width: Px(300.0),
+                    height: Px(50.0),
+                    justify_content: JustifyContent::Center,
+                    align_items: AlignItems::Center,
+                    ..default()
+                },
+                background_color: BackgroundColor(NODE_BACKGROUND),
+                ..default()
+            },
+        ));
+
+        // Add a child TextBundle for displaying the placeholder or user-entered text
+        entity.with_children(|children| {
+            children.spawn((
+                Name::new("TextInput Text"),
+                TextBundle::from_section(
+                    placeholder,
+                    TextStyle {
+                        font_size: 24.0,
+                        color: LABEL_TEXT,
+                        ..default()
+                    },
+                ),
+            ));
+        });
+
+        entity
+    }
 }
 
 /// An extension trait for spawning UI containers.
@@ -151,4 +195,10 @@ impl Spawn for ChildBuilder<'_> {
     fn spawn<B: Bundle>(&mut self, bundle: B) -> EntityCommands {
         self.spawn(bundle)
     }
+}
+
+#[derive(Component)]
+struct TextInput {
+    pub text: String,
+    pub placeholder: String,
 }
