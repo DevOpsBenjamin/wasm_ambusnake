@@ -9,7 +9,6 @@ pub(super) fn plugin(app: &mut App) {
     app.add_systems(Update, show_title_screen.run_if(in_state(Screen::Title)));
 }
 
-
 fn show_title_screen(
     mut egui_context: EguiContexts,
     mut next_screen: ResMut<NextState<Screen>>,
@@ -28,22 +27,40 @@ fn show_title_screen(
             ui.add_space(50.0); // Space between title and buttons
 
             // Larger buttons with custom text size
-            if ui.add_sized([200.0, 70.0], egui::Button::new(
-                egui::RichText::new("Play").size(30.0) // Larger font for button text
-            )).clicked() {
+            if ui
+                .add_sized(
+                    [200.0, 70.0],
+                    egui::Button::new(
+                        egui::RichText::new("Play").size(30.0), // Larger font for button text
+                    ),
+                )
+                .clicked()
+            {
                 next_screen.set(Screen::Gameplay);
             }
 
-            if ui.add_sized([200.0, 70.0], egui::Button::new(
-                egui::RichText::new("HighScore").size(30.0) // Larger font for button text
-            )).clicked() {
+            if ui
+                .add_sized(
+                    [200.0, 70.0],
+                    egui::Button::new(
+                        egui::RichText::new("HighScore").size(30.0), // Larger font for button text
+                    ),
+                )
+                .clicked()
+            {
                 next_screen.set(Screen::HighScore);
             }
 
             #[cfg(not(target_family = "wasm"))]
-            if ui.add_sized([200.0, 70.0], egui::Button::new(
-                egui::RichText::new("Exit").size(30.0) // Larger font for button text
-            )).clicked() {
+            if ui
+                .add_sized(
+                    [200.0, 70.0],
+                    egui::Button::new(
+                        egui::RichText::new("Exit").size(30.0), // Larger font for button text
+                    ),
+                )
+                .clicked()
+            {
                 app_exit.send(AppExit::Success);
             }
         });
