@@ -26,7 +26,7 @@ pub(super) fn plugin(app: &mut App) {
     );
     app.add_systems(
         Update,
-        (check_movement, apply_transform)
+        (check_movement, apply_transform, apply_rotation)
             .chain()
             .in_set(AppSet::Update)
             .run_if(in_state(Screen::Gameplay)),
@@ -83,6 +83,7 @@ fn check_input(
 fn check_movement(
     mut query_move: Query<&mut MoveManager>,
     mut query_snake: Query<(&mut Position, &SnakeSegment)>,
+    query_diff: Query<&Difficulty>,
 ) {
     // Return early if there is no single `MoveManager` component
     let mut move_manager = match query_move.get_single_mut() {
@@ -91,16 +92,24 @@ fn check_movement(
     };
 
     // Return early if there is not a move timer
-    if let Some(timer) = &move_manager.timer {
+    if let Some(timer) = &mut move_manager.timer {
         if !timer.finished() {
             return; // Exit early if the timer is not finished
         }
     } else {
         return; // Exit early if there is no timer
     }
+
+    // Return early if there is no single `Difficulty` component
+    let difficulty = match query_diff.get_single() {
+        Ok(difficulty) => difficulty,
+        Err(_) => return,
+    };
+
+    move_manager.update_duration(difficulty.move_duration);
     //THE NEW MOVE IS THE OLD NEXT DIR
     move_manager.dir = move_manager.next_dir;
-
+    
     // Collect all segments into a vector and sort by index in ascending order
     let mut segments: Vec<_> = query_snake.iter_mut().collect();
     // Sort by idx value
@@ -130,6 +139,48 @@ fn check_movement(
         // Update last_x and last_y to the current position for the next segment
         last_x = curr_x;
         last_y = curr_y;
+    }
+}
+
+fn apply_rotation(
+    query_move: Query<&MoveManager>,
+    mut query_snake: Query<(&mut Transform, &SnakeSegment)>,
+) {
+    // Return early if there is no single `MoveManager` component
+    let move_manager = match query_move.get_single() {
+        Ok(move_manager) => move_manager,
+        Err(_) => return,
+    };
+
+    // Return early if there is not a move timer
+    if let Some(timer) = &move_manager.timer {
+        if !timer.finished() {
+            return; // Exit early if the timer is not finished
+        }
+    } else {
+        return; // Exit early if there is no timer
+    }
+
+    // Find the head segment with idx == 0, return early if not found
+    let mut head_transform = match query_snake.iter_mut().find_map(|(transform, segment)| {
+        if segment.idx == 0 {
+            Some(transform)
+        } else {
+            None
+        }
+    }) {
+        Some(position) => position,
+        None => return,
+    };
+    head_transform.rotation = get_rotation_from_dir(move_manager.dir);
+}
+
+fn get_rotation_from_dir(dir: Dir) -> Quat {    
+    match dir {
+        Dir::Up => Quat::from_rotation_z(0.0),            // 0 degrees (0 radians)
+        Dir::Left => Quat::from_rotation_z(std::f32::consts::FRAC_PI_2), // 90 degrees (π/2 radians)
+        Dir::Down => Quat::from_rotation_z(std::f32::consts::PI), // 180 degrees (π radians)
+        Dir::Right => Quat::from_rotation_z(std::f32::consts::FRAC_PI_2 * 3.0), // 270 degrees (3π/2 radians)
     }
 }
 
@@ -230,6 +281,13 @@ impl MoveManager {
             if dir == possibility_1 || dir == possibility_2 {
                 self.next_dir = dir;
             }
+        }
+    }
+
+    pub fn update_duration(&mut self, duration: Duration) {
+        // Return early if there is not a move timer
+        if let Some(timer) = &mut self.timer {
+            timer.set_duration(duration);
         }
     }
 }

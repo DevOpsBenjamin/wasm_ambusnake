@@ -55,7 +55,7 @@ fn init_snake(
         &mut commands,
         snake_assets.head.clone(),
         SnakeSegment { idx: 0 },
-        Position { x: 12, y: 7, z: 1 },
+        Position { x: 12, y: 7, z: 2 },
         window_width,
         window_height,
     );
