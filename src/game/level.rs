@@ -79,8 +79,8 @@ impl Position {
                 self.z as f32,
             ),
             scale: Vec3::new(
-                box_width_size / (BOX_SIZE as f32),
-                box_height_size / (BOX_SIZE as f32),
+                0.5 * box_width_size / (BOX_SIZE as f32),
+                0.5 * box_height_size / (BOX_SIZE as f32),
                 1.0,
             ),
             ..Default::default()

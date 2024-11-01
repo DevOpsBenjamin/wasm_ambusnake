@@ -78,3 +78,29 @@ fn show_title_screen(
         });
     });
 }
+
+            /*
+fn show_title_screen(
+    mut egui_context: EguiContexts,
+    mut next_screen: ResMut<NextState<Screen>>,
+    mut app_exit: EventWriter<AppExit>,
+    snake_assets: Res<SnakeAssets>,
+    bonus_assets: Res<BonusAssets>,
+) {
+    // Load the images from the assets
+    let left_image_id = egui_context.add_image(snake_assets.head.clone());
+    let right_image_id = egui_context.add_image(bonus_assets.bonus.clone());
+
+    egui::CentralPanel::default().show(egui_context.ctx_mut(), |ui| {
+        ui.add_space(50.0); // Space above the content
+
+        // Create a horizontal layout
+        ui.horizontal(|ui| {
+            // Left Column
+            ui.vertical_centered(|ui| {
+                ui.add(egui::widgets::Image::new(egui::load::SizedTexture::new(
+                    left_image_id,
+                    egui::vec2(128.0, 128.0), // Size of the image
+                )));
+            }); // Ensure this column takes 1/3 of width
+*/
