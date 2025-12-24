@@ -12,7 +12,7 @@ pub(super) fn plugin(app: &mut App) {
 fn show_title_screen(
     mut egui_context: EguiContexts,
     mut next_screen: ResMut<NextState<Screen>>,
-    mut app_exit: EventWriter<AppExit>,
+    #[cfg_attr(target_family = "wasm", allow(unused))] mut app_exit: EventWriter<AppExit>,
 ) {
     egui::CentralPanel::default().show(egui_context.ctx_mut(), |ui| {
         // Adding padding around the panel

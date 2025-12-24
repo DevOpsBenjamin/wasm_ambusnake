@@ -8,8 +8,10 @@ mod screens;
 use bevy::{
     asset::AssetMetaCheck,
     audio::{AudioPlugin, Volume},
+    log::{Level, LogPlugin},
     prelude::*,
 };
+use bevy_egui::EguiPlugin;
 
 pub struct AppPlugin;
 
@@ -27,6 +29,11 @@ impl Plugin for AppPlugin {
         // Add Bevy plugins.
         app.add_plugins(
             DefaultPlugins
+                .set(LogPlugin {
+                    filter: "warn,ui=info".to_string(),
+                    level: Level::INFO,
+                    ..default()
+                })
                 .set(AssetPlugin {
                     // Wasm builds will check for meta files (that don't exist) if this isn't set.
                     // This causes errors and even panics on web build on itch.
@@ -54,7 +61,12 @@ impl Plugin for AppPlugin {
         );
 
         // Add other plugins.
-        app.add_plugins((asset_tracking::plugin, game::plugin, screens::plugin));
+        app.add_plugins((
+            asset_tracking::plugin,
+            game::plugin,
+            screens::plugin,
+            EguiPlugin,
+        ));
 
         // Enable dev tools for dev builds.
         #[cfg(feature = "dev")]
