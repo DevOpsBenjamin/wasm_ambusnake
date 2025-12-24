@@ -18,12 +18,11 @@ tracing = { version = "0.1", features = [
     "max_level_debug",
     "release_max_level_warn",
 ] }
+getrandom = { version = "0.3.4", features = ["wasm_js"] }
+uuid = { version = "1.19.0", features = ["v4", "js"] }
 
 [features]
-default = [
-    # Default to a native dev build.
-    "dev_native",
-]
+default = []
 dev = [
     # Improve compile times for dev builds by linking Bevy as a dynamic library.
     "bevy/dynamic_linking",
