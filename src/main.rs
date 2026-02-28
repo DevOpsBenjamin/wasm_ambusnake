@@ -2,6 +2,7 @@
 #![cfg_attr(not(feature = "dev"), windows_subsystem = "windows")]
 
 use ambu_snake::AppPlugin;
+use bevy::log::{Level, LogPlugin};
 use bevy::prelude::*;
 use bevy_egui::EguiPlugin;
 
