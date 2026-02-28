@@ -8,6 +8,9 @@ edition = "2021"
 bevy = { version = "0.14", features = ["wayland"] }
 bevy_egui = { version = "0.30.0", default-features = false }
 rand = "0.8"
+getrandom = { version = "0.2", features = ["js"] }
+getrandom_3 = { package = "getrandom", version = "0.3", features = ["wasm_js"] }
+uuid = { version = "1.21.0", features = ["js"] }
 # Compile low-severity logs out of native builds for performance.
 log = { version = "0.4", features = [
     "max_level_debug",
